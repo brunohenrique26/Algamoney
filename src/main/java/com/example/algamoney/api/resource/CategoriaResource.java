@@ -19,7 +19,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.example.algamoney.api.model.Categoria;
 import com.example.algamoney.api.repository.CategoriaRepository;
 
-
 @RestController
 @RequestMapping("/categorias")
 public class CategoriaResource {
@@ -36,15 +35,17 @@ public class CategoriaResource {
 	public ResponseEntity<Categoria> criar(@RequestBody Categoria categoria, HttpServletResponse response) {
 		Categoria categoriaSalva = categoriaRepository.save(categoria);
 		
-		URI uri =  ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
-		  .buildAndExpand(categoriaSalva.getCodigo()).toUri();
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
+			.buildAndExpand(categoriaSalva.getCodigo()).toUri();
 		response.setHeader("Location", uri.toASCIIString());
 		
 		return ResponseEntity.created(uri).body(categoriaSalva);
-		}
+	}
 	
 	@GetMapping("/{codigo}")
-	public Optional<Categoria> buscarPeloCodigo(@PathVariable long codigo) {
-		return categoriaRepository.findById(codigo);
+	public  ResponseEntity<Optional<Categoria>>buscarPeloCodigo(@PathVariable Long codigo) {
+		Optional<Categoria> categoria = categoriaRepository.findById(codigo);
+		return categoria.isPresent() ? ResponseEntity.ok(categoria) : ResponseEntity.notFound().build();
 	}
+	
 }
